@@ -7,7 +7,8 @@ defmodule EctoRawSqlHelpers.MixProject do
       version: "0.1.0",
       elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(Mix.env()),
+      elixirc_paths: elixirc_paths(Mix.env()),
     ]
   end
 
@@ -18,12 +19,22 @@ defmodule EctoRawSqlHelpers.MixProject do
     ]
   end
 
-  # Run "mix help deps" to learn about dependencies.
-  defp deps do
+  defp deps(:test) do
+    [
+      {:ecto_sql, ">= 2.0.0"},
+      {:postgrex, ">= 0.0.0"},
+      {:myxql, ">= 0.4.0"},
+      {:telemetry_poller, "~> 0.4"},
+    ]
+  end
+  defp deps(_) do
     [
       {:ecto_sql, ">= 2.0.0", optional: true},
       {:postgrex, ">= 0.0.0", optional: true},
       {:myxql, ">= 0.4.0", optional: true}
     ]
   end
+
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 end
