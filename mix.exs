@@ -1,4 +1,4 @@
-defmodule EctoRawSqlHelpers.MixProject do
+defmodule EctoRawSQLHelpers.MixProject do
   use Mix.Project
 
   def project do
@@ -21,14 +21,15 @@ defmodule EctoRawSqlHelpers.MixProject do
 
   defp deps(:test) do
     [
+      {:pipe_operators, git: "https://github.com/leveexpress/pipe_operators.git", branch: "main"},
       {:ecto_sql, ">= 2.0.0"},
       {:postgrex, ">= 0.0.0"},
-      {:myxql, ">= 0.4.0"},
       {:telemetry_poller, "~> 0.4"},
     ]
   end
   defp deps(_) do
     [
+      {:pipe_operators, git: "https://github.com/leveexpress/pipe_operators.git", branch: "main", optional: true},
       {:ecto_sql, ">= 2.0.0", optional: true},
       {:postgrex, ">= 0.0.0", optional: true},
       {:myxql, ">= 0.4.0", optional: true}

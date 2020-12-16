@@ -1,13 +1,14 @@
-defmodule EctoRawSqlHelpers.SQLStream do
-  import EctoRawSqlHelpers.Helpers
-  alias EctoRawSqlHelpers.StreamServer
+defmodule EctoRawSQLHelpers.SQLStream do
+  alias EctoRawSQLHelpers.DatabaseResponseParser
+  alias EctoRawSQLHelpers.AdapterSQLExecutor
+  alias EctoRawSQLHelpers.StreamServer
 
   def query(repo_or_pid, sql, params \\ [], options \\ []) do
     Stream.resource(
-      fn -> adapter_query(repo_or_pid, sql, params, options) end,
+      fn -> AdapterSQLExecutor.adapter_query(repo_or_pid, sql, params, options) end,
       fn
-        {:ok, %{columns: columns, rows: rows}} -> {[convert_row_to_map(hd(rows), columns, options)], {columns, tl(rows)}}
-        {columns, [row|tail]} -> {[convert_row_to_map(row, columns, options)], {columns, tail}}
+        {:ok, %{columns: columns, rows: rows}} -> {[DatabaseResponseParser.convert_row_to_map(hd(rows), columns, options)], {columns, tl(rows)}}
+        {columns, [row|tail]} -> {[DatabaseResponseParser.convert_row_to_map(row, columns, options)], {columns, tail}}
         {_columns, []} -> {:halt, :ok}
       end,
       fn _ -> :ok end
@@ -30,9 +31,8 @@ defmodule EctoRawSqlHelpers.SQLStream do
     end
   end
 
-
   defp stream_rows_as_maps(%{columns: columns, rows: rows}, options) do
     rows
-    |> Enum.map(&convert_row_to_map(&1, columns, options))
+    |> Enum.map(&DatabaseResponseParser.convert_row_to_map(&1, columns, options))
   end
 end

@@ -1,4 +1,4 @@
-defmodule EctoRawSqlHelpers.StreamServer do
+defmodule EctoRawSQLHelpers.StreamServer do
   defmodule StreamRequest do
     defstruct [
       :client_pid,
