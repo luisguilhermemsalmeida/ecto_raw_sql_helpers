@@ -1,3 +1,5 @@
-EctoRawSQLHelpers.RepoForTest.start_link()
+{:ok, _pid} = EctoRawSQLHelpers.PostgresRepoForTest.start_link()
+{:ok, _pid} = EctoRawSQLHelpers.MySQLRepoForTest.start_link()
 ExUnit.start()
-Ecto.Adapters.SQL.Sandbox.mode(EctoRawSQLHelpers.RepoForTest, :manual)
+Ecto.Adapters.SQL.Sandbox.mode(EctoRawSQLHelpers.PostgresRepoForTest, :manual)
+Ecto.Adapters.SQL.Sandbox.mode(EctoRawSQLHelpers.MySQLRepoForTest, :manual)

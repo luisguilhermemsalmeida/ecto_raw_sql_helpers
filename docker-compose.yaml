@@ -1,0 +1,26 @@
+version: "3"
+
+services:
+  postgres-database:
+    image: postgres:11.6
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - 5430:5432
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=root
+  mysql-database:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_DATABASE: "root"
+    ports:
+      - "3300:3306"
+    volumes:
+      - mysql:/data/mysql
+
+volumes:
+  postgres: {}
+  mysql: {}

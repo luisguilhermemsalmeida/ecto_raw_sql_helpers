@@ -12,6 +12,6 @@ defmodule EctoRawSQLHelpers.Helpers do
     |> case do
       nil -> Application.get_env(:ecto_raw_sql_helper, :column_names_as_atoms, false)
       value -> value
-     end
+    end
   end
 end

@@ -3,18 +3,22 @@ defmodule SQLCase do
 
   using do
     quote do
-      use ExUnit.Case
+      use ExUnit.Case, async: false
     end
   end
 
-  setup tags do
-    Ecto.Adapters.SQL.Sandbox.mode(EctoRawSQLHelpers.RepoForTest, :manual)
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(EctoRawSQLHelpers.RepoForTest)
-
-    unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(EctoRawSQLHelpers.RepoForTest, {:shared, self()})
-    end
+  setup do
+    [
+      EctoRawSQLHelpers.PostgresRepoForTest,
+      EctoRawSQLHelpers.MySQLRepoForTest
+    ]
+    |> Enum.each(&setup_database_for_tests/1)
 
     :ok
+  end
+
+  defp setup_database_for_tests(database) do
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(database)
+    Ecto.Adapters.SQL.Sandbox.mode(database, {:shared, self()})
   end
 end

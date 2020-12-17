@@ -20,10 +20,9 @@ defmodule EctoRawSQLHelpers.StreamServer do
           fn ->
             Ecto.Adapters.SQL.stream(repo_or_pid, sql, params, options)
             |> Enum.each(&wait_for_demand_and_send_response/1)
-
-            wait_for_demand_and_send_finished_state()
           end
         )
+        wait_for_demand_and_send_finished_state()
       end
     )
   end

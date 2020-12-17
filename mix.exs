@@ -7,8 +7,9 @@ defmodule EctoRawSQLHelpers.MixProject do
       version: "0.1.0",
       elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod,
-      deps: deps(Mix.env()),
+      deps: deps(),
       elixirc_paths: elixirc_paths(Mix.env()),
+      aliases: aliases(),
     ]
   end
 
@@ -19,20 +20,19 @@ defmodule EctoRawSQLHelpers.MixProject do
     ]
   end
 
-  defp deps(:test) do
+  defp deps() do
     [
       {:pipe_operators, git: "https://github.com/leveexpress/pipe_operators.git", branch: "main"},
       {:ecto_sql, ">= 2.0.0"},
-      {:postgrex, ">= 0.0.0"},
-      {:telemetry_poller, "~> 0.4"},
+      {:postgrex, ">= 0.0.0", only: [:test]},
+      {:myxql, ">= 0.4.0", only: [:test]},
+      {:telemetry_poller, "~> 0.4", only: [:test]}
     ]
   end
-  defp deps(_) do
+
+  defp aliases do
     [
-      {:pipe_operators, git: "https://github.com/leveexpress/pipe_operators.git", branch: "main", optional: true},
-      {:ecto_sql, ">= 2.0.0", optional: true},
-      {:postgrex, ">= 0.0.0", optional: true},
-      {:myxql, ">= 0.4.0", optional: true}
+      test: ["cmd docker-compose up -d", "cmd sleep 10", "ecto.create --quiet", "test"]
     ]
   end
 
