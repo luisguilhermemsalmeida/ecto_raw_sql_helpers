@@ -11,7 +11,7 @@ defmodule EctoRawSQLHelpers.SQLStreamTest do
   end
 
   test "query stream using database cursor should work" do
-    query_result = SQLStream.stream_query_from_database(EctoRawSQLHelpers.PostgresRepoForTest, "SELECT * FROM generate_series(1, 3)")
+    query_result = SQLStream.cursor(EctoRawSQLHelpers.PostgresRepoForTest, "SELECT * FROM generate_series(1, 3)")
                    |> Stream.map(fn %{"generate_series" => number} -> number + 1 end)
                    |> Enum.to_list()
 

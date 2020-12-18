@@ -16,7 +16,7 @@ defmodule EctoRawSQLHelpers.SQLStream do
     )
   end
 
-  def stream_query_from_database(repo_or_pid, sql, params \\ [], options \\ []) do
+  def cursor(repo_or_pid, sql, params \\ [], options \\ []) do
     Stream.resource(
       fn -> StreamServer.initialize_stream_server_and_wait_for_demand(repo_or_pid, sql, params, options) end,
       fn pid -> handle_client_demand(pid, options) end,
