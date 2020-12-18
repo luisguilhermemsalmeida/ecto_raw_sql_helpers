@@ -22,16 +22,34 @@ defmodule EctoRawSQLHelpers.NamedParameterTranslator do
     adapter,
     options
   ) do
+    parameter = find_parameter_or_raise!(named_parameter, parameters_map, options)
+
     {
-      sql <> adapter_placeholder(adapter, param_list),
-      param_list ++ [find_parameter_or_raise!(named_parameter, parameters_map, options)]
+      sql <> adapter_placeholder(adapter, param_list, parameter),
+      param_list ++ parameter_to_list(parameter)
     }
   end
 
-  defp adapter_placeholder(Ecto.Adapters.Postgres, param_list) do
+  defp adapter_placeholder(Ecto.Adapters.Postgres, param_list, {:in, values}) do
+    previous_parameters = Enum.count(param_list) + 1
+    in_clause_parameters = Enum.count(values)
+
+    previous_parameters..in_clause_parameters
+    |> Enum.map(fn index -> "$" <> to_string(index) end)
+    |> Enum.join(",")
+  end
+  defp adapter_placeholder(Ecto.Adapters.Postgres, param_list, _parameter) do
     "$" <> to_string(Enum.count(param_list) + 1)
   end
-  defp adapter_placeholder(Ecto.Adapters.MyXQL, _param_list) do
+
+  defp adapter_placeholder(Ecto.Adapters.MyXQL, _param_list, {:in, values}) do
+    in_clause_parameters = Enum.count(values)
+
+    1..in_clause_parameters
+    |> Enum.map(fn _ -> "?" end)
+    |> Enum.join(",")
+  end
+  defp adapter_placeholder(Ecto.Adapters.MyXQL, _param_list, _parameter) do
     "?"
   end
 
@@ -52,4 +70,10 @@ defmodule EctoRawSQLHelpers.NamedParameterTranslator do
     end
   end
 
+  defp parameter_to_list({:in, values}) do
+    values
+  end
+  defp parameter_to_list(values) do
+    [values]
+  end
 end

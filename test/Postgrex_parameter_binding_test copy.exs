@@ -11,8 +11,8 @@ defmodule EctoRawSQLHelpers.PostgrexParameterBindingTest do
 
     affected_rows = SQL.affecting_statement(
       EctoRawSQLHelpers.PostgresRepoForTest,
-       "INSERT INTO test (value) VALUES (:value)",
-       %{value: "some string"}
+       "INSERT INTO test (value) VALUES (:id, :value), (10, 'some value')",
+       %{id: 5, value: "some string"}
     )
 
     assert affected_rows == 1
@@ -25,6 +25,30 @@ defmodule EctoRawSQLHelpers.PostgrexParameterBindingTest do
     )
 
     assert query_result == %{value: "some string"}
+
+    query_result = SQL.query(
+      EctoRawSQLHelpers.PostgresRepoForTest,
+       "SELECT id FROM test WHERE id IN(:ids) ORDER BY id",
+       %{ids: {:in, [5, 10]}},
+       column_names_as_atoms: true
+    )
+
+    assert query_result == [
+      %{id: 5},
+      %{id: 10},
+    ]
+
+    query_result = SQL.query(
+      EctoRawSQLHelpers.PostgresRepoForTest,
+       "SELECT id FROM test WHERE id = ANY(:ids) ORDER BY id",
+       %{ids: [5, 10],
+       column_names_as_atoms: true
+    )
+
+    assert query_result == [
+      %{id: 5},
+      %{id: 10},
+    ]
   end
 
   setup do
