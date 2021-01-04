@@ -2,7 +2,6 @@ defmodule EctoRawSQLHelpers.SQLStream do
   alias EctoRawSQLHelpers.DatabaseResponseParser
   alias EctoRawSQLHelpers.AdapterSQLExecutor
   alias EctoRawSQLHelpers.StreamServer
-  require IEx
 
   def query(repo_or_pid, sql, params \\ [], options \\ []) do
     Stream.resource(
