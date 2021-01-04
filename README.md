@@ -2,9 +2,9 @@
 
 Working with raw SQL in Ecto may be disapointing, since the lib offers little support to it.
 EctoRawSQLHelpers aims to close that gap by providing helper functions when dealing with raw SQL, such as:
-- Named parameters support (aka `"SELECT :one, :two" + %{one: 1, two: 2}` instead of `"SELECT $1, $2" + [1, 2]`)
+- Named parameters support (aka `"SELECT :one, :two"` binding `%{one: 1, two: 2}` instead of `"SELECT $1, $2"` binding `[1, 2]`)
 - Response parsing (getting query results as lists of maps, number of rows affected on statements, etc )
-- Stream support
+- Stream support for dealing with big result sets
 
 # Usage 
 
@@ -15,7 +15,7 @@ EctoRawSQLHelpers aims to close that gap by providing helper functions when deal
 alias EctoRawSQLHelpers.SQL
 
 SQL.query(MyApplication.Repo, "SELECT * FROM table")
-#> [%{id: 1, column_name: "some value"}, %{id: 2, column_name: "some value"}]
+#> [%{"id" => 1, "column_name" => "some value"}, %{"id" => 2, "column_name" => "some value"}]
 ```
 
 
@@ -27,7 +27,7 @@ For single result queries, the function `query_get_single_result/4` might be use
 ```elixir
 alias EctoRawSQLHelpers.SQL
 
-SQL.query_get_single_result(MyApplication.Repo, "SELECT * FROM table WHERE id = :id", %{id: 2})
+SQL.query_get_single_result(MyApplication.Repo, "SELECT * FROM table WHERE id = :id", %{id: 2}, column_names_as_atoms: true)
 #> %{id: 2, column_name: "some value"}
 #> nil
 #> {:error, "query_get_single_result_as_map returned more than one row, 2 rows returned"}
@@ -38,7 +38,7 @@ SQL.query_get_single_result(MyApplication.Repo, "SELECT * FROM table WHERE id = 
 When you wish to run queries that can return large result sets, it might be wise to use `Streams` when dealing with such data.
 This lib offers two ways of Streaming result sets from the database
 - `SQLStream.query/4`
-- `SQLStream.cursor_stream/4`
+- `SQLStream.cursor/4`
 
 `SQLStream.query/4` will query the whole dataset from the database and then stream each row individually. Because the query is fetched from the databse all at once, it can still be quite memory intensive.
 
@@ -56,9 +56,9 @@ SQLStream.cursor(MyApplication.Repo, "SELECT * FROM table")
 |> Stream.map(&transformation/1)
 |> Enum.reduce(&sum/2)
 ```
-Both methods will yield the same results. 
+Both methods will yield the same results. Considering the table has many rows (> 100k)
 - using `SQLStream.query/4` will generally be faster, since there is no overhead of using database cursors.
-- using `SQLStream.cursor/4` will generally be slower, but will use much less memory 
+- using `SQLStream.cursor/4` will generally be slower, but will use dramatically less memory 
 
 ### Options
 
@@ -74,8 +74,37 @@ config :ecto_raw_sql_helper, [
 ]
 ```
 
+## Affecting statements (INSERTs, UPDATEs, DELETEs, etc)
+When running affecting statments such as a UPDATE or DELETE, it's sometimes useful to know the number of rows affected in the database.
+
+This lib also offers functions for that matter:
+- `SQL.affecting_statement/4`
+- `SQL.affecting_statement_and_return_rows/4` (postgres only)
+- `SQL.affecting_statement_and_return_single_row/4` (postgres only)
+
+```elixir
+alias EctoRawSQLHelpers.SQL
+
+SQLStream.affecting_statement(
+  MyApplication.Repo,
+  "INSERT INTO table (id) VALUES (:first_value), (:second_value)",
+  %{"first_value" => 1, "second_value" => 2}
+)
+#> 2
+
+# the RETURNING clause is not available in MySQL,
+# instead you would use the LAST_INSERT_ID() function
+SQLStream.affecting_statement_and_return_rows(
+  MyApplication.Repo,
+  "INSERT INTO table (value) VALUES (:first_value), (:second_value) RETURNING id",
+  %{first_value: "value", second_value: "value2"}
+)
+#> [%{"id" => 1}, %{"id" => 2}]
+```
+
 ## Parameter Binding
-This lib providers named parameter binding. When running a query, you may specify parameters using the following syntax `:parameter_name` and then send the parameter as a map `%{parameter_name: "value"}`.
+This lib providers named parameter binding. When running a query, you may specify parameters using the following syntax `WHERE value = :parameter_name` and then send the parameter as a map `%{"parameter_name" => "value"}`.
+The parameters can be both atoms or strings, so `%{parameter_name: "value"}` is also accepted. (if the same key is sent twice, the string version will be used)
 
 ### Array binding
 Postgres supports array binding for some queries, example:
@@ -83,7 +112,7 @@ Postgres supports array binding for some queries, example:
 ```elixir
 SQL.query(MyApplication.Repo, "SELECT * FROM table WHERE id = ANY(:ids)", %{ids: [1, 2, 3]})
 ```
-However, if you are using MySQL or prefer to use the `IN` sql clause, we got your back :)
+However, if you are using MySQL or prefer to use the `IN` sql clause, we got your back 🙂
 
 ```elixir
 SQL.query(MyApplication.Repo, "SELECT * FROM table WHERE id IN (:ids)", %{ids: {:in, [1, 2, 3]}})
@@ -96,6 +125,9 @@ Special thanks to these un-oficial contributors for code reviews and pair-progra
 
 ![https://github.com/jomaro](https://github.com/jomaro.png?size=50)
 ![https://github.com/thiagopromano](https://github.com/thiagopromano.png?size=50)
+
+- [@jomaro](https://github.com/jomaro)
+- [@thiagopromano](https://github.com/thiagopromano)
 # Installation
 
 Add `ecto_raw_sql_helpers` to your list of dependencies in `mix.exs`:

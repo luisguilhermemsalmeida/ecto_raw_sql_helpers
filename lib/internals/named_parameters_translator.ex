@@ -62,12 +62,17 @@ defmodule EctoRawSQLHelpers.NamedParameterTranslator do
   end
 
   defp find_parameter_or_raise!(":" <> named_parameter, parameters_map, _options) do
-    parameters_map
-    |> Map.has_key?(String.to_atom(named_parameter))
+    get_parameter(parameters_map, named_parameter)
     |> case do
-      false -> raise SQLParameterNotSetException, parameter_name: named_parameter
-      true -> Map.fetch!(parameters_map, String.to_atom(named_parameter))
+      :error -> raise SQLParameterNotSetException, parameter_name: named_parameter
+      value -> value
     end
+  end
+
+  defp get_parameter(parameters_map, named_parameter) do
+    Map.get(parameters_map, named_parameter)
+    || Map.get(parameters_map, String.to_atom(named_parameter))
+    || :error
   end
 
   defp parameter_to_list({:in, values}) do

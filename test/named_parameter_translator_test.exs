@@ -26,4 +26,16 @@ defmodule EctoRawSQLHelpers.NamedParameterTranslatorTest do
     assert sql == "SELECT ?, ?, ?"
     assert params == [1, 2, 1]
   end
+
+  test "named parameter translator should work with both string and atom parameters" do
+    {sql, params} = NamedParameterTranslator.translate_named_parameters(
+      Ecto.Adapters.MyXQL,
+      "SELECT :one, :two, :one",
+      %{"one" => 1, two: 2},
+      []
+    )
+
+    assert sql == "SELECT ?, ?, ?"
+    assert params == [1, 2, 1]
+  end
 end
