@@ -11,11 +11,11 @@ defmodule EctoRawSQLHelpers.PostgrexParameterBindingTest do
 
     affected_rows = SQL.affecting_statement(
       EctoRawSQLHelpers.PostgresRepoForTest,
-       "INSERT INTO test (value) VALUES (:id, :value), (10, 'some value')",
+       "INSERT INTO test (id, value) VALUES (:id, :value), (10, 'some value')",
        %{id: 5, value: "some string"}
     )
 
-    assert affected_rows == 1
+    assert affected_rows == 2
 
     query_result = SQL.query_get_single_result(
       EctoRawSQLHelpers.PostgresRepoForTest,
@@ -41,7 +41,7 @@ defmodule EctoRawSQLHelpers.PostgrexParameterBindingTest do
     query_result = SQL.query(
       EctoRawSQLHelpers.PostgresRepoForTest,
        "SELECT id FROM test WHERE id = ANY(:ids) ORDER BY id",
-       %{ids: [5, 10],
+       %{ids: [5, 10]},
        column_names_as_atoms: true
     )
 
@@ -49,6 +49,43 @@ defmodule EctoRawSQLHelpers.PostgrexParameterBindingTest do
       %{id: 5},
       %{id: 10},
     ]
+  end
+
+  test "Postgrex UUID handling" do
+    Ecto.Adapters.SQL.query!(
+      EctoRawSQLHelpers.PostgresRepoForTest,
+      """
+        CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+      """
+    )
+
+    Ecto.Adapters.SQL.query!(
+      EctoRawSQLHelpers.PostgresRepoForTest,
+      """
+        CREATE TABLE test_uuid (
+          id UUID PRIMARY KEY,
+          value TEXT
+        )
+      """
+    )
+
+    affected_rows = SQL.affecting_statement(
+      EctoRawSQLHelpers.PostgresRepoForTest,
+       "INSERT INTO test_uuid (id, value) VALUES (:id, :value)",
+       %{id: "fd942ed4-3f0a-4cb3-be4c-12bfae3c56df", value: "some string"}
+    )
+
+    assert affected_rows == 1
+
+    row = SQL.query_get_single_result(
+      EctoRawSQLHelpers.PostgresRepoForTest,
+       "SELECT * FROM test_uuid"
+    )
+
+    assert row == %{
+      id: "fd942ed4-3f0a-4cb3-be4c-12bfae3c56df", value: "some string"
+    }
+
   end
 
   setup do

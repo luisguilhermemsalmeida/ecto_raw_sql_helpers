@@ -13,7 +13,8 @@ config :ecto_raw_sql_helpers, EctoRawSQLHelpers.PostgresRepoForTest,
        pool: Ecto.Adapters.SQL.Sandbox,
        port: 5430,
        show_sensitive_data_on_connection_error: true,
-       pool_size: 1
+       pool_size: 1,
+       types: EctoRawSQLHelpers.Postgrex.CustomUUIDType
 
 config :ecto_raw_sql_helpers, EctoRawSQLHelpers.MySQLRepoForTest,
       username: "root",
