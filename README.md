@@ -66,14 +66,6 @@ The last argument of the functions in this lib is the `options` parameter. It is
 - `:column_names_as_atoms` This option controls whether the column names returned will be strings or atoms. Defaults to false. Can be controlled using a ENV with the same name.
 - `:adapter_sql_function` This option controls the function used to run the query in the database, it defaults to `&Ecto.Adapters.SQL.query/4`. If you wish to do some pre-processing just before querying the database, you can use this option to do so. You may also use it to return mocked responses.
 
-### Config
-You may also use the following configs in your config.exs file:
-```elixir
-config :ecto_raw_sql_helper, [
-  column_names_as_atoms: true
-]
-```
-
 ## Affecting statements (INSERTs, UPDATEs, DELETEs, etc)
 When running affecting statments such as a UPDATE or DELETE, it's sometimes useful to know the number of rows affected in the database.
 
@@ -119,6 +111,29 @@ SQL.query(MyApplication.Repo, "SELECT * FROM table WHERE id IN (:ids)", %{ids: {
 ```
 
 Both will yield the same results as expected.
+
+## Config
+You may also use the following configs in your config.exs file:
+```elixir
+config :ecto_raw_sql_helper, [
+  column_names_as_atoms: true
+]
+```
+
+### Postgres UUID
+An UUID value returned by a postgres column will be a binary value that cannot be differenciated from a regular string. This lib also provides a custom UUID handler that can be activated by including the following option in your Repo config:
+```elixir
+  config :myapp, MyApp.Repo,
+       #...
+       types: EctoRawSQLHelpers.Postgrex.CustomUUIDType
+```
+By using the `CustomUUIDType`, UUID fields will cast UUIDs to strings automatically:
+
+```elixir
+SQL.query_get_single_result(MyApplication.Repo, "SELECT id FROM table_uuid WHERE id = :id", %{id: "7c5aa420-3245-4188-a9c3-2c16357afddd"})
+#> %{id: "7c5aa420-3245-4188-a9c3-2c16357afddd"}
+```
+
 
 # Contributors
 Special thanks to these un-oficial contributors for code reviews and pair-programming:
