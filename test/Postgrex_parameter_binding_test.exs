@@ -49,6 +49,17 @@ defmodule EctoRawSQLHelpers.PostgrexParameterBindingTest do
       %{id: 5},
       %{id: 10},
     ]
+
+    query_result = SQL.query(
+      EctoRawSQLHelpers.PostgresRepoForTest,
+       "SELECT 1.0::integer as number",
+       %{},
+       column_names_as_atoms: true
+    )
+
+    assert query_result == [
+      %{number: 1},
+    ]
   end
 
   test "Postgrex UUID handling" do

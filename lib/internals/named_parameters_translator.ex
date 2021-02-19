@@ -1,9 +1,9 @@
 defmodule EctoRawSQLHelpers.NamedParameterTranslator do
-  @split_regex ~r/:\w+/
+  @split_regex ~r/(?<!:)(?<parameter>:\w+)/
 
   def translate_named_parameters(adapter, sql, params, options) do
     @split_regex
-    |> Regex.split(sql, trim: true, include_captures: true)
+    |> Regex.split(sql, trim: true, include_captures: true, on: [:parameter])
     |> Enum.map(&is_parameter/1)
     |> Enum.reduce({_sql = "", _parameter_list = []}, &translate_query_and_params_to_provider_placeholder(&1, &2, params, adapter, options))
   end
