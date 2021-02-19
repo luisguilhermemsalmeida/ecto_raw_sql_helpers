@@ -28,3 +28,4 @@ ecto_raw_sql_helpers-*.tar
 
 # IDE files
 .idea/
+.vscode/
