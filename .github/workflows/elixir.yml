@@ -1,10 +1,6 @@
 name: Elixir CI
 
-on:
-  push:
-    branches: [ feature/interface-proposal ]
-  pull_request:
-    branches: [ feature/interface-proposal ]
+on: [push, pull_request]
 
 jobs:
   build:
