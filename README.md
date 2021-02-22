@@ -115,7 +115,7 @@ Both will yield the same results as expected.
 ## Config
 You may also use the following configs in your config.exs file:
 ```elixir
-config :ecto_raw_sql_helper, [
+config :ecto_raw_sql_helpers, [
   column_names_as_atoms: true
 ]
 ```
