@@ -10,7 +10,7 @@ defmodule EctoRawSQLHelpers.Helpers do
   defp is_enabled?(options) do
     Keyword.get(options, :column_names_as_atoms)
     |> case do
-      nil -> Application.get_env(:ecto_raw_sql_helper, :column_names_as_atoms, false)
+      nil -> Application.get_env(:ecto_raw_sql_helpers, :column_names_as_atoms, false)
       value -> value
     end
   end
