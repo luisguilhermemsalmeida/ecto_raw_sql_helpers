@@ -42,9 +42,9 @@ defmodule EctoRawSQLHelpers.MyXQLParameterBindingTest do
   end
 
   setup do
-    Application.put_env(:ecto_raw_sql_helper, :column_names_as_atoms, true)
+    Application.put_env(:ecto_raw_sql_helpers, :column_names_as_atoms, true)
     on_exit(fn ->
-      Application.delete_env(:ecto_raw_sql_helper, :column_names_as_atoms)
+      Application.delete_env(:ecto_raw_sql_helpers, :column_names_as_atoms)
     end)
     :ok
   end
