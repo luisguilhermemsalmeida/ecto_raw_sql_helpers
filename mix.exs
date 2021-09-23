@@ -22,7 +22,7 @@ defmodule EctoRawSQLHelpers.MixProject do
 
   defp deps() do
     [
-      {:pipe_operators, git: "https://github.com/leveexpress/pipe_operators.git", branch: "main"},
+      {:pipe_operators, git: "https://github.com/luisguilhermemsalmeida/pipe_operators.git", branch: "main"},
       {:ecto_sql, ">= 2.0.0"},
       {:postgrex, ">= 0.0.0", only: [:test]},
       {:myxql, ">= 0.4.0", only: [:test]},
