@@ -150,7 +150,7 @@ Add `ecto_raw_sql_helpers` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-     {:ecto_raw_sql_helpers, git: "https://github.com/leveexpress/ecto_raw_sql_helpers.git", branch: "main"},
+     {:ecto_raw_sql_helpers, "~> 0.1.2"},
   ]
 end
 ```
