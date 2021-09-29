@@ -136,7 +136,7 @@ SQL.query_get_single_result(MyApplication.Repo, "SELECT id FROM table_uuid WHERE
 
 
 # Contributors
-Special thanks to these un-oficial contributors for code reviews and pair-programming:
+Special thanks to these contributors for code reviews and pair-programming:
 
 ![https://github.com/jomaro](https://github.com/jomaro.png?size=50)
 ![https://github.com/thiagopromano](https://github.com/thiagopromano.png?size=50)

@@ -10,6 +10,7 @@ defmodule EctoRawSQLHelpers.MixProject do
       deps: deps(),
       elixirc_paths: elixirc_paths(Mix.env()),
       aliases: aliases(),
+      package: package(),
     ]
   end
 
@@ -38,4 +39,11 @@ defmodule EctoRawSQLHelpers.MixProject do
 
   defp elixirc_paths(:test), do: ["lib", "test/support"]
   defp elixirc_paths(_), do: ["lib"]
+
+  defp package() do
+    [
+      licenses: ["MIT"],
+      links: %{"GitHub" => "https://github.com/luisguilhermemsalmeida/ecto_raw_sql_helpers"}
+    ]
+  end
 end
